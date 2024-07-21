@@ -20,6 +20,23 @@ repositories {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.postgresql:postgresql:42.7.3")
+    implementation("me.paulschwarz:spring-dotenv:4.0.0")
+
+    // Lombok
+    annotationProcessor("org.projectlombok:lombok:1.18.34")
+    testCompileOnly("org.projectlombok:lombok:1.18.34")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.34")
+
+    // testcontainers
+    testImplementation("org.testcontainers:testcontainers:1.20.0")
+    testImplementation("org.testcontainers:junit-jupiter:1.20.0")
+    testImplementation("org.testcontainers:jdbc:1.20.0")
+    testImplementation("org.testcontainers:postgresql:1.20.0")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
