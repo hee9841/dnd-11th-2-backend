@@ -29,12 +29,9 @@ public class SocialProfileRepositoryImpl implements SocialProfileRepository {
 
     @Override
     public SocialProfile save(SocialProfile socialProfile) {
-        SocialProfileEntity entity = jpaSocialProfileRepository.save(SocialProfileEntity.of(
-                socialProfile.socialType(),
-                socialProfile.oauthId(),
-                socialProfile.oauthEmail(),
-                socialProfile.memberId()));
-        return entity.toDomain();
+        return jpaSocialProfileRepository
+                .save(SocialProfileEntity.from(socialProfile))
+                .toDomain();
     }
 
     @Override

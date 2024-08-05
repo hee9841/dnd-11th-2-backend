@@ -2,7 +2,6 @@ package com.dnd.runus.infrastructure.persistence.jpa.member.entity;
 
 import com.dnd.runus.domain.badge.Badge;
 import com.dnd.runus.domain.common.BaseTimeEntity;
-import com.dnd.runus.domain.level.Level;
 import com.dnd.runus.domain.member.Member;
 import com.dnd.runus.global.constant.MemberRole;
 import jakarta.persistence.*;
@@ -30,8 +29,6 @@ public class MemberEntity extends BaseTimeEntity {
     @Size(max = 20)
     private String nickname;
 
-    private Integer weightKg;
-
     private Long mainBadgeId;
 
     public static MemberEntity from(Member member) {
@@ -39,27 +36,16 @@ public class MemberEntity extends BaseTimeEntity {
         memberEntity.id = member.memberId();
         memberEntity.role = member.role();
         memberEntity.nickname = member.nickname();
-        memberEntity.weightKg = member.weightKg();
         memberEntity.mainBadgeId =
                 member.mainBadge() == null ? null : member.mainBadge().badgeId();
         return memberEntity;
     }
 
     public Member toDomain() {
-        return toDomain(null, null, -1);
+        return toDomain(null);
     }
 
-    public Member toDomain(Badge mainBadge, Level level, int currentExp) {
-        return Member.builder()
-                .memberId(id)
-                .createdAt(getCreatedAt())
-                .updatedAt(getUpdatedAt())
-                .role(role)
-                .nickname(nickname)
-                .weightKg(weightKg)
-                .mainBadge(mainBadge)
-                .level(level)
-                .currentExp(currentExp)
-                .build();
+    public Member toDomain(Badge mainBadge) {
+        return new Member(id, getCreatedAt(), getUpdatedAt(), role, nickname, mainBadge);
     }
 }

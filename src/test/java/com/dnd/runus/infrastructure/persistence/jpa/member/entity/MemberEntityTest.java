@@ -1,7 +1,6 @@
 package com.dnd.runus.infrastructure.persistence.jpa.member.entity;
 
 import com.dnd.runus.domain.badge.Badge;
-import com.dnd.runus.domain.level.Level;
 import com.dnd.runus.domain.member.Member;
 import com.dnd.runus.global.constant.BadgeType;
 import com.dnd.runus.global.constant.MemberRole;
@@ -20,17 +19,7 @@ class MemberEntityTest {
     void setUp() {
         Badge badge =
                 new Badge(1L, "badge name", "badge description", "https://badge.com", BadgeType.DISTANCE_METER, 1000);
-        member = Member.builder()
-                .memberId(1L)
-                .role(MemberRole.USER)
-                .nickname("nickname")
-                .weightKg(60)
-                .mainBadge(badge)
-                .createdAt(OffsetDateTime.now())
-                .updatedAt(OffsetDateTime.now())
-                .level(new Level(1L, 100))
-                .currentExp(0)
-                .build();
+        member = new Member(1L, OffsetDateTime.now(), OffsetDateTime.now(), MemberRole.USER, "nickname", badge);
     }
 
     @Test

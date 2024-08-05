@@ -8,8 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @RepositoryTest
 class MemberRepositoryImplTest {
@@ -17,25 +16,16 @@ class MemberRepositoryImplTest {
     private MemberRepository memberRepository;
 
     @Test
-    @DisplayName("findById 메서드는 Member를 반환한다.")
+    @DisplayName("findById 메서드는 해당하는 id의 Member가 없다면 null을 반환한다.")
     void findById() {
         Member member = memberRepository.findById(1L).orElse(null);
-        System.out.println(member);
+        assertNull(member);
     }
 
     @Test
     @DisplayName("save 메서드는 Member를 저장하고 id와 함께 반환한다.")
     void save() {
-        Member member = Member.builder()
-                .role(MemberRole.USER)
-                .nickname("nickname")
-                .weightKg(60)
-                .mainBadge(null)
-                .createdAt(null)
-                .updatedAt(null)
-                .level(null)
-                .currentExp(0)
-                .build();
+        Member member = new Member(MemberRole.USER, "nickname");
         Member savedMember = memberRepository.save(member);
         assertNotEquals(0, savedMember.memberId());
         assertNotNull(savedMember.createdAt());
