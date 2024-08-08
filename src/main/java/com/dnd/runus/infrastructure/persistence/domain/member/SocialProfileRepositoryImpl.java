@@ -13,6 +13,7 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class SocialProfileRepositoryImpl implements SocialProfileRepository {
+
     private final JpaSocialProfileRepository jpaSocialProfileRepository;
 
     @Override
@@ -39,5 +40,10 @@ public class SocialProfileRepositoryImpl implements SocialProfileRepository {
         jpaSocialProfileRepository
                 .findById(socialProfileId)
                 .ifPresent(socialProfileEntity -> socialProfileEntity.updateOauthEmail(oauthEmail));
+    }
+
+    @Override
+    public void deleteByMemberId(long memberId) {
+        jpaSocialProfileRepository.deleteByMemberId(memberId);
     }
 }

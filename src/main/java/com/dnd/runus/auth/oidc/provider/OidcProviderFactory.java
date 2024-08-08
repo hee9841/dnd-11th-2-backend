@@ -3,7 +3,6 @@ package com.dnd.runus.auth.oidc.provider;
 import com.dnd.runus.global.constant.SocialType;
 import com.dnd.runus.global.exception.BusinessException;
 import com.dnd.runus.global.exception.type.ErrorType;
-import io.jsonwebtoken.Claims;
 import org.springframework.stereotype.Component;
 
 import java.util.EnumMap;
@@ -22,13 +21,13 @@ public class OidcProviderFactory {
         providers.forEach(provider -> authProviderMap.put(provider.getSocialType(), provider));
     }
 
-    public Claims getClaims(SocialType socialType, String idToken) {
+    public OidcProvider getOidcProviderBy(SocialType socialType) {
         OidcProvider oidcProvider = authProviderMap.get(socialType);
 
         if (isNull(oidcProvider)) {
             throw new BusinessException(ErrorType.UNSUPPORTED_SOCIAL_TYPE, socialType.getValue());
         }
 
-        return oidcProvider.getClaimsBy(idToken);
+        return oidcProvider;
     }
 }
