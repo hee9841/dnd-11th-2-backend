@@ -1,6 +1,5 @@
-package com.dnd.runus.client.config;
+package com.dnd.runus.auth.oidc.client;
 
-import com.dnd.runus.client.web.AppleAuthClientComponent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.ClientHttpRequestFactories;
 import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
@@ -17,18 +16,19 @@ import java.time.Duration;
 public class RestClientConfig {
 
     @Bean
-    public AppleAuthClientComponent appleAuthClientService(@Value("${oauth.apple.public-key-url}") String url) {
+    AppleAuthClient appleAuthClient(@Value("${oauth.apple.base-auth-url}") String baseAuthUrl) {
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
                 .withReadTimeout(Duration.ofSeconds(5))
                 .withConnectTimeout(Duration.ofSeconds(10));
         ClientHttpRequestFactory requestFactory = ClientHttpRequestFactories.get(settings);
 
-        RestClient restClient =
-                RestClient.builder().baseUrl(url).requestFactory(requestFactory).build();
-        RestClientAdapter adapter = RestClientAdapter.create(restClient);
-        HttpServiceProxyFactory factory =
-                HttpServiceProxyFactory.builderFor(adapter).build();
+        RestClient restClient = RestClient.builder()
+                .baseUrl(baseAuthUrl)
+                .requestFactory(requestFactory)
+                .build();
 
-        return factory.createClient(AppleAuthClientComponent.class);
+        return HttpServiceProxyFactory.builderFor(RestClientAdapter.create(restClient))
+                .build()
+                .createClient(AppleAuthClient.class);
     }
 }

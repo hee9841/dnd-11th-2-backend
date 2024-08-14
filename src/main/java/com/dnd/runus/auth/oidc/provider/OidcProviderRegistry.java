@@ -12,11 +12,11 @@ import java.util.Map;
 import static java.util.Objects.isNull;
 
 @Component
-public class OidcProviderFactory {
+public class OidcProviderRegistry {
 
     private final Map<SocialType, OidcProvider> authProviderMap;
 
-    public OidcProviderFactory(List<OidcProvider> providers) {
+    public OidcProviderRegistry(List<OidcProvider> providers) {
         authProviderMap = new EnumMap<>(SocialType.class);
         providers.forEach(provider -> authProviderMap.put(provider.getSocialType(), provider));
     }
