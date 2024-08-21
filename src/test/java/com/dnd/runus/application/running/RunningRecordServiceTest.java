@@ -13,7 +13,7 @@ import com.dnd.runus.global.exception.BusinessException;
 import com.dnd.runus.global.exception.type.ErrorType;
 import com.dnd.runus.presentation.v1.running.dto.RunningRecordMetricsDto;
 import com.dnd.runus.presentation.v1.running.dto.request.RunningRecordRequest;
-import com.dnd.runus.presentation.v1.running.dto.response.RunningRecordReportResponse;
+import com.dnd.runus.presentation.v1.running.dto.response.RunningRecordAddResultResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -59,11 +59,12 @@ class RunningRecordServiceTest {
         RunningRecordRequest request = new RunningRecordRequest(
                 LocalDateTime.of(2021, 1, 1, 12, 10, 30),
                 LocalDateTime.of(2021, 1, 1, 13, 12, 10),
+                "start location",
+                "end location",
                 RunningEmoji.VERY_GOOD,
                 1L,
                 new RunningRecordMetricsDto(
                         new Pace(5, 30),
-                        "location name",
                         Duration.ofSeconds(10_100),
                         10_000,
                         500.0,
@@ -76,7 +77,8 @@ class RunningRecordServiceTest {
                 .endAt(request.endAt().atOffset(defaultZoneOffset))
                 .route(request.runningData().route())
                 .emoji(request.emoji())
-                .location(request.runningData().location())
+                .startLocation(request.startLocation())
+                .endLocation(request.endLocation())
                 .distanceMeter(request.runningData().distanceMeter())
                 .duration(request.runningData().runningTime())
                 .calorie(request.runningData().calorie())
@@ -86,7 +88,7 @@ class RunningRecordServiceTest {
         given(runningRecordRepository.save(expected)).willReturn(expected);
 
         // when
-        RunningRecordReportResponse response = runningRecordService.addRunningRecord(1L, request);
+        RunningRecordAddResultResponse response = runningRecordService.addRunningRecord(1L, request);
 
         // then
         assertEquals(request.startAt(), response.startAt());
@@ -100,11 +102,12 @@ class RunningRecordServiceTest {
         RunningRecordRequest request = new RunningRecordRequest(
                 LocalDateTime.of(2021, 1, 1, 12, 10, 30),
                 LocalDateTime.of(2021, 1, 1, 11, 12, 10),
+                "start location",
+                "end location",
                 RunningEmoji.VERY_GOOD,
                 1L,
                 new RunningRecordMetricsDto(
                         new Pace(5, 30),
-                        "location name",
                         Duration.ofSeconds(10_100),
                         10_000,
                         500.0,
@@ -123,11 +126,12 @@ class RunningRecordServiceTest {
         RunningRecordRequest request = new RunningRecordRequest(
                 LocalDateTime.of(2021, 1, 1, 12, 10, 30),
                 LocalDateTime.of(2021, 1, 1, 13, 12, 10),
+                "start location",
+                "end location",
                 RunningEmoji.VERY_GOOD,
                 1L,
                 new RunningRecordMetricsDto(
                         new Pace(5, 30),
-                        "location name",
                         Duration.ofSeconds(10_100),
                         10_000,
                         500.0,

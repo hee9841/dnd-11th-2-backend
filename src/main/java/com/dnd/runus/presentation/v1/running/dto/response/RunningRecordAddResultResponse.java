@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 
-public record RunningRecordReportResponse(
+public record RunningRecordAddResultResponse(
         long runningRecordId,
         LocalDateTime startAt,
         LocalDateTime endAt,
@@ -20,8 +20,8 @@ public record RunningRecordReportResponse(
         @NotNull
         RunningRecordMetricsDto runningData
 ) {
-    public static RunningRecordReportResponse from(RunningRecord runningRecord) {
-        return new RunningRecordReportResponse(
+    public static RunningRecordAddResultResponse from(RunningRecord runningRecord) {
+        return new RunningRecordAddResultResponse(
                 runningRecord.runningId(),
                 runningRecord.startAt().toLocalDateTime(),
                 runningRecord.endAt().toLocalDateTime(),
@@ -30,7 +30,6 @@ public record RunningRecordReportResponse(
                 new ChallengeDto(-1), // TODO: 챌린지 기능 추가 후 수정
                 new RunningRecordMetricsDto(
                         runningRecord.averagePace(),
-                        runningRecord.location(),
                         runningRecord.duration(),
                         runningRecord.distanceMeter(),
                         runningRecord.calorie(),
