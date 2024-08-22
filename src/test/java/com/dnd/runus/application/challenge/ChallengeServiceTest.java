@@ -4,16 +4,15 @@ import com.dnd.runus.domain.challenge.achievement.ChallengeAchievement;
 import com.dnd.runus.domain.challenge.achievement.ChallengeAchievementRecord;
 import com.dnd.runus.domain.challenge.achievement.ChallengeAchievementRepository;
 import com.dnd.runus.domain.challenge.achievement.ChallengePercentageValues;
+import com.dnd.runus.domain.challenge.achievement.dto.ChallengeAchievementDto;
 import com.dnd.runus.domain.challenge.*;
 import com.dnd.runus.domain.common.Coordinate;
 import com.dnd.runus.domain.common.Pace;
 import com.dnd.runus.domain.member.Member;
-import com.dnd.runus.domain.member.MemberRepository;
 import com.dnd.runus.domain.running.RunningRecord;
 import com.dnd.runus.domain.running.RunningRecordRepository;
 import com.dnd.runus.global.constant.MemberRole;
 import com.dnd.runus.global.constant.RunningEmoji;
-import com.dnd.runus.presentation.v1.challenge.dto.response.ChallengeAchievementResponse;
 import com.dnd.runus.presentation.v1.challenge.dto.response.ChallengesResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -48,9 +47,6 @@ class ChallengeServiceTest {
 
     @Mock
     private ChallengeRepository challengeRepository;
-
-    @Mock
-    private MemberRepository memberRepository;
 
     @InjectMocks
     private ChallengeService challengeService;
@@ -124,8 +120,7 @@ class ChallengeServiceTest {
                 "25분",
                 "url",
                 ChallengeType.DEFEAT_YESTERDAY,
-                List.of(new ChallengeCondition(
-                        1, 1, ChallengeGoalType.DISTANCE, ComparisonType.GREATER, goalDistance)));
+                List.of(new ChallengeCondition(1, 1, GoalType.DISTANCE, ComparisonType.GREATER, goalDistance)));
 
         OffsetDateTime yesterdayMidnight = todayMidnight.minusDays(1);
 
@@ -157,7 +152,6 @@ class ChallengeServiceTest {
                 "end location",
                 RunningEmoji.SOSO);
 
-        given(memberRepository.findById(member.memberId())).willReturn(Optional.of(member));
         given(challengeRepository.findById(challenge.challengeId())).willReturn(Optional.of(challenge));
         given(runningRecordRepository.findByMemberIdAndStartAtBetween(
                         member.memberId(), yesterdayMidnight, todayMidnight))
@@ -173,8 +167,7 @@ class ChallengeServiceTest {
         given(challengeAchievementRepository.save(expected)).willReturn(expected);
 
         // when
-        ChallengeAchievementResponse response =
-                challengeService.save(member.memberId(), runningRecord, challenge.challengeId());
+        ChallengeAchievementDto response = challengeService.save(runningRecord, challenge.challengeId());
 
         // then
         assertNotNull(response);
@@ -194,8 +187,7 @@ class ChallengeServiceTest {
                 "25분",
                 "url",
                 ChallengeType.TODAY,
-                List.of(new ChallengeCondition(
-                        1, 1, ChallengeGoalType.DISTANCE, ComparisonType.GREATER, goalDistance)));
+                List.of(new ChallengeCondition(1, 1, GoalType.DISTANCE, ComparisonType.GREATER, goalDistance)));
 
         RunningRecord runningRecord = new RunningRecord(
                 2,
@@ -211,7 +203,6 @@ class ChallengeServiceTest {
                 "end location",
                 RunningEmoji.SOSO);
 
-        given(memberRepository.findById(member.memberId())).willReturn(Optional.of(member));
         given(challengeRepository.findById(challenge.challengeId())).willReturn(Optional.of(challenge));
 
         ChallengePercentageValues percentageValues =
@@ -224,8 +215,7 @@ class ChallengeServiceTest {
         given(challengeAchievementRepository.save(expected)).willReturn(expected);
 
         // when
-        ChallengeAchievementResponse response =
-                challengeService.save(member.memberId(), runningRecord, challenge.challengeId());
+        ChallengeAchievementDto response = challengeService.save(runningRecord, challenge.challengeId());
 
         // then
         assertNotNull(response);
@@ -245,8 +235,7 @@ class ChallengeServiceTest {
                 "25분",
                 "url",
                 ChallengeType.TODAY,
-                List.of(new ChallengeCondition(
-                        1L, challengeId, ChallengeGoalType.DISTANCE, ComparisonType.GREATER, 1000)));
+                List.of(new ChallengeCondition(1L, challengeId, GoalType.DISTANCE, ComparisonType.GREATER, 1000)));
         RunningRecord runningRecord = new RunningRecord(
                 runningId,
                 new Member(MemberRole.USER, "nickname"),
@@ -270,8 +259,7 @@ class ChallengeServiceTest {
         given(challengeRepository.findById(challengeId)).willReturn(Optional.of(challenge));
 
         // when
-        ChallengeAchievementResponse response =
-                challengeService.findChallengeAchievementBy(member.memberId(), runningId);
+        ChallengeAchievementDto response = challengeService.findChallengeAchievementBy(member.memberId(), runningId);
 
         // then
         assertNotNull(response);
@@ -289,8 +277,7 @@ class ChallengeServiceTest {
                 .willReturn(Optional.empty());
 
         // when
-        ChallengeAchievementResponse response =
-                challengeService.findChallengeAchievementBy(member.memberId(), runningId);
+        ChallengeAchievementDto response = challengeService.findChallengeAchievementBy(member.memberId(), runningId);
 
         // then
         assertNull(response);

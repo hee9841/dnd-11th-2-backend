@@ -1,4 +1,4 @@
-package com.dnd.runus.presentation.v1.challenge.dto.response;
+package com.dnd.runus.domain.challenge.achievement.dto;
 
 
 import com.dnd.runus.domain.challenge.Challenge;
@@ -7,10 +7,7 @@ import com.dnd.runus.global.constant.ChallengeResultComment;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.jetbrains.annotations.NotNull;
 
-public record ChallengeAchievementResponse(
-    @NotNull
-    @Schema(description = "챌린지 id")
-    long challengeId,
+public record ChallengeAchievementDto(
     @NotNull
     @Schema(description = "챌린지 이미지 url")
     String imageUrl,
@@ -27,9 +24,8 @@ public record ChallengeAchievementResponse(
     @Schema(description = "챌린지 성공, 실패 여부")
     Boolean successStatus
 ) {
-    public static ChallengeAchievementResponse from(ChallengeAchievement achievement, Challenge challenge) {
-        return new ChallengeAchievementResponse(
-            challenge.challengeId(),
+    public static ChallengeAchievementDto from(ChallengeAchievement achievement, Challenge challenge) {
+        return new ChallengeAchievementDto(
             challenge.imageUrl(),
             challenge.name(),
             ChallengeResultComment.getComment(achievement.record().successStatus()),
