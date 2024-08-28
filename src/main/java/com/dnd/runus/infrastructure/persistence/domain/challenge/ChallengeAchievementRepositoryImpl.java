@@ -13,18 +13,18 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ChallengeAchievementRepositoryImpl implements ChallengeAchievementRepository {
 
-    private final JpaChallengeAchievementRepository challengeAchievementRepository;
+    private final JpaChallengeAchievementRepository jpaChallengeAchievementRepository;
 
     @Override
     public ChallengeAchievement save(ChallengeAchievement challengeAchievement) {
-        return challengeAchievementRepository
+        return jpaChallengeAchievementRepository
                 .save(ChallengeAchievementEntity.from(challengeAchievement))
                 .toDomain();
     }
 
     @Override
-    public Optional<ChallengeAchievement> findByRunningRecordId(long runningId) {
-        return challengeAchievementRepository
+    public Optional<ChallengeAchievement> findByRunningId(Long runningId) {
+        return jpaChallengeAchievementRepository
                 .findByRunningRecordId(runningId)
                 .map(ChallengeAchievementEntity::toDomain);
     }

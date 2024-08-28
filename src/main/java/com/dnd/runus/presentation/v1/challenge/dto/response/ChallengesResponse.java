@@ -11,7 +11,7 @@ public record ChallengesResponse(
     Long challengeId,
     @Schema(description = "챌린지 이름")
     @NotNull
-    String name,
+    String title,
     @Schema(
         description = "예상 소요 시간",
         example = "25분"
@@ -19,7 +19,7 @@ public record ChallengesResponse(
     String expectedTime,
     @Schema(description = "챌린지 이미지 URL")
     @NotNull
-    String imageUrl
+    String icon
 ) {
     public static ChallengesResponse from(Challenge challenge) {
         return new ChallengesResponse(

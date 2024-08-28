@@ -1,10 +1,11 @@
 package com.dnd.runus.domain.challenge;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ChallengeRepository {
-    List<Challenge> getChallenges(boolean hasPreRecord);
+    List<Challenge> findAllChallenges();
 
-    Optional<Challenge> findById(Long id);
+    List<Challenge> findAllIsNotDefeatYesterday();
+
+    ChallengeWithCondition findChallengeWithConditionsByChallengeId(long challengeId);
 }
