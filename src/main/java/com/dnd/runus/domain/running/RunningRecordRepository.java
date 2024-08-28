@@ -15,4 +15,6 @@ public interface RunningRecordRepository {
             long memberId, OffsetDateTime startTime, OffsetDateTime endTime);
 
     boolean hasByMemberIdAndStartAtBetween(long memberId, OffsetDateTime startTime, OffsetDateTime endTime);
+
+    int findTotalDistanceMeterByMemberId(long memberId, OffsetDateTime startDate, OffsetDateTime endDate);
 }
