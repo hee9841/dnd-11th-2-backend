@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -31,7 +32,7 @@ public class ChallengeRepositoryImpl implements ChallengeRepository {
     }
 
     @Override
-    public ChallengeWithCondition findChallengeWithConditionsByChallengeId(long challengeId) {
-        return jooqChallengeRepository.findChallengeWithConditionsBy(challengeId);
+    public Optional<ChallengeWithCondition> findChallengeWithConditionsByChallengeId(long challengeId) {
+        return Optional.ofNullable(jooqChallengeRepository.findChallengeWithConditionsBy(challengeId));
     }
 }

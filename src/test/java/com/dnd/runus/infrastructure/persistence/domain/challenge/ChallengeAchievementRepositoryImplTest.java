@@ -1,5 +1,7 @@
 package com.dnd.runus.infrastructure.persistence.domain.challenge;
 
+import com.dnd.runus.domain.challenge.Challenge;
+import com.dnd.runus.domain.challenge.ChallengeType;
 import com.dnd.runus.domain.challenge.achievement.ChallengeAchievement;
 import com.dnd.runus.domain.challenge.achievement.ChallengeAchievementRepository;
 import com.dnd.runus.domain.common.Coordinate;
@@ -36,6 +38,7 @@ public class ChallengeAchievementRepositoryImplTest {
     private RunningRecordRepository runningRecordRepository;
 
     private RunningRecord runningRecord;
+    private Challenge challenge;
 
     @BeforeEach
     void setUp() {
@@ -53,14 +56,14 @@ public class ChallengeAchievementRepositoryImplTest {
                 "start location",
                 "end location",
                 RunningEmoji.SOSO));
+        challenge = new Challenge(1, "name", 60, "imageUrl", ChallengeType.DEFEAT_YESTERDAY);
     }
 
-    @DisplayName("사용자 챌린지 성취 저장")
+    @DisplayName("ChallengeAchievement 저장시, 성공여부가 true인지 확인")
     @Test
     void saveAchievement() {
         // given
-        long challengeId = 1L;
-        ChallengeAchievement challengeAchievement = new ChallengeAchievement(challengeId, runningRecord, true);
+        ChallengeAchievement challengeAchievement = new ChallengeAchievement(challenge, runningRecord, true);
 
         // when
         ChallengeAchievement saved = challengeAchievementRepository.save(challengeAchievement);
@@ -68,21 +71,5 @@ public class ChallengeAchievementRepositoryImplTest {
         // then
         assertNotNull(saved);
         assertTrue(saved.isSuccess());
-    }
-
-    @DisplayName("사용자 챌린지 기록 조회 : runningid로 조회")
-    @Test
-    void findByRunningId() {
-        // given
-        long challengeId = 1L;
-        challengeAchievementRepository.save(new ChallengeAchievement(challengeId, runningRecord, true));
-
-        // when
-        ChallengeAchievement challengeAchievement = challengeAchievementRepository
-                .findByRunningId(runningRecord.runningId())
-                .orElse(null);
-
-        // then
-        assertNotNull(challengeAchievement);
     }
 }
