@@ -249,8 +249,8 @@ class RunningRecordRepositoryImplTest {
                     Duration.ofHours(1),
                     1,
                     new Pace(5, 11),
-                    OffsetDateTime.now(),
-                    OffsetDateTime.now(),
+                    OffsetDateTime.now(ZoneId.of(SERVER_TIMEZONE)),
+                    OffsetDateTime.now(ZoneId.of(SERVER_TIMEZONE)),
                     List.of(new Coordinate(1, 2, 3), new Coordinate(4, 5, 6)),
                     "start location",
                     "end location",
@@ -260,8 +260,6 @@ class RunningRecordRepositoryImplTest {
         // when
         List<RunningRecordWeeklySummary> result =
                 runningRecordRepository.findWeeklyDistanceSummaryMeter(savedMember.memberId(), today);
-
-        System.out.println("!!!!!!!!!!Test:" + today.toLocalDate());
 
         // then
         assertThat(result.size()).isEqualTo(7);
