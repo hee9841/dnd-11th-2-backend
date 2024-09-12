@@ -22,10 +22,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.dnd.runus.global.constant.TimeConstant.SERVER_TIMEZONE;
 import static com.dnd.runus.global.constant.TimeConstant.SERVER_TIMEZONE_ID;
@@ -264,29 +261,29 @@ class RunningRecordRepositoryImplTest {
         List<RunningRecordWeeklySummary> result =
                 runningRecordRepository.findWeeklyDistanceSummaryMeter(savedMember.memberId(), startDate);
 
-        Map<Integer, Integer> ma = new HashMap<>();
-
-        List<Integer> rrr = new ArrayList<>();
-        for (int i = 1; i < 8; i++) {
-            ma.put(i, null);
-        }
-        for (RunningRecordWeeklySummary r : result) {
-            int value = r.date().getDayOfWeek().getValue();
-            Integer ids = r.sumDistanceMeter();
-            ma.put(value, ids);
-        }
-
+        //        Map<Integer, Integer> ma = new HashMap<>();
+        //
+        //        List<Integer> rrr = new ArrayList<>();
+        //        for (int i = 1; i < 8; i++) {
+        //            ma.put(i, null);
+        //        }
+        //        for (RunningRecordWeeklySummary r : result) {
+        //            int value = r.date().getDayOfWeek().getValue();
+        //            Integer ids = r.sumDistanceMeter();
+        //            ma.put(value, ids);
+        //        }
+        //
         int todayValue = today.getDayOfWeek().getValue();
+        LocalDate todayLocalDate = today.toLocalDate();
 
         // then
-        log.warn("size!!!!!" + ma.size());
-        log.warn("todya!!!!!" + today.toString());
-        assertThat(ma.size()).isEqualTo(7);
-        for (int i = 1; i < 8; i++) {
-            if (i == todayValue) {
-                assertThat(ma.get(i)).isEqualTo(10_000);
+        assertThat(result.size()).isEqualTo(7);
+
+        for (RunningRecordWeeklySummary r : result) {
+            if (r.date().toString().equals(todayLocalDate.toString())) {
+                assertThat(r.sumDistanceMeter()).isEqualTo(10000);
             } else {
-                assertNull(ma.get(i));
+                assertNull(r.sumDistanceMeter());
             }
         }
     }
