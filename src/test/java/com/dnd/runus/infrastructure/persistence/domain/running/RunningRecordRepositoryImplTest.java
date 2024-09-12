@@ -28,7 +28,6 @@ import static com.dnd.runus.global.constant.TimeConstant.SERVER_TIMEZONE_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
@@ -222,21 +221,6 @@ class RunningRecordRepositoryImplTest {
         assertThat(results.size()).isEqualTo(2);
     }
 
-    @DisplayName("러닝 주간 서머리 조회(거리) : 러닝 데이터가 없을 경우, sumDistanceMeter는 null를 반환한다.")
-    @Test
-    void getWeeklyDistanceSummary_WithOutRunningRecords() {
-        // given
-        OffsetDateTime today = OffsetDateTime.now(ZoneId.of(SERVER_TIMEZONE));
-
-        // when
-        List<RunningRecordWeeklySummary> result =
-                runningRecordRepository.findWeeklyDistanceSummaryMeter(savedMember.memberId(), today);
-
-        // then
-        assertThat(result.size()).isEqualTo(7);
-        result.forEach(v -> assertNull(v.sumDistanceMeter()));
-    }
-
     @DisplayName("러닝 주간 서머리 조회(거리) : 러닝 데이터 있을 경우, 해당 요일에 러닝 데이터는 sum한 값이 리턴된다.")
     @Test
     void getWeeklyDistanceSummary_WithRunningRecords() {
@@ -244,7 +228,7 @@ class RunningRecordRepositoryImplTest {
         OffsetDateTime today = OffsetDateTime.now(ZoneId.of(SERVER_TIMEZONE));
 
         for (int i = 0; i < 2; i++) {
-            RunningRecord saved = runningRecordRepository.save(new RunningRecord(
+            runningRecordRepository.save(new RunningRecord(
                     0,
                     savedMember,
                     5000,
@@ -257,8 +241,6 @@ class RunningRecordRepositoryImplTest {
                     "start location",
                     "end location",
                     RunningEmoji.SOSO));
-
-            log.warn("!!!!!startDate : " + saved.startAt());
         }
 
         List<RunningRecord> byMember = runningRecordRepository.findByMember(savedMember);

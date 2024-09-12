@@ -72,10 +72,11 @@ public class JooqRunningRecordRepository {
     private static class RunningWeeklyDistanceSummary implements RecordMapper<Record, RunningRecordWeeklySummary> {
         @Override
         public RunningRecordWeeklySummary map(Record record) {
+            LocalDate date = record.get("date", LocalDate.class);
+            Integer sum = record.get("sum_distance", Integer.class);
             log.warn("RunningRecordWeeklySummary Map!!!!!!");
-            log.warn(record.get("date", LocalDate.class).toString() + ": " + record.get("sum_distance", Integer.class));
-            return new RunningRecordWeeklySummary(
-                    record.get("date", LocalDate.class), record.get("sum_distance", Integer.class));
+            log.warn("date" + date + ": " + sum);
+            return new RunningRecordWeeklySummary(date, sum);
         }
     }
 }
