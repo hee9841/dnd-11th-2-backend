@@ -20,6 +20,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -224,8 +225,9 @@ class RunningRecordRepositoryImplTest {
     @DisplayName("러닝 주간 서머리 조회(거리) : 러닝 데이터 있을 경우, 해당 요일에 러닝 데이터는 sum한 값이 리턴된다.")
     @Test
     void getWeeklyDistanceSummary_WithRunningRecords() {
+        ZoneOffset defaultZoneOffset = ZoneOffset.of("+09:00");
         // given
-        OffsetDateTime today = OffsetDateTime.now(ZoneId.of(SERVER_TIMEZONE));
+        OffsetDateTime today = OffsetDateTime.now(defaultZoneOffset);
 
         for (int i = 0; i < 2; i++) {
             runningRecordRepository.save(new RunningRecord(
@@ -235,8 +237,8 @@ class RunningRecordRepositoryImplTest {
                     Duration.ofHours(1),
                     1,
                     new Pace(5, 11),
-                    OffsetDateTime.now(ZoneId.of(SERVER_TIMEZONE)),
-                    OffsetDateTime.now(ZoneId.of(SERVER_TIMEZONE)),
+                    OffsetDateTime.now(defaultZoneOffset),
+                    OffsetDateTime.now(defaultZoneOffset),
                     List.of(new Coordinate(1, 2, 3), new Coordinate(4, 5, 6)),
                     "start location",
                     "end location",
