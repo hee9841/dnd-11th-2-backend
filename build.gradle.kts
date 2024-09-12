@@ -1,8 +1,17 @@
+buildscript {
+    dependencies {
+        classpath("${libs.testcontainers.postgresql.get()}")
+        classpath("${libs.flyway.database.postgresql.get()}")
+    }
+}
+
 plugins {
     java
-    id("org.springframework.boot") version "3.3.1"
-    id("io.spring.dependency-management") version "1.1.5"
-    id("com.diffplug.spotless") version "6.25.0"
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency.management)
+    alias(libs.plugins.spotless)
+    alias(libs.plugins.flyway)
+    alias(libs.plugins.jooq)
 }
 
 group = "com.dnd"
@@ -18,34 +27,43 @@ repositories {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter")
-    implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("me.paulschwarz:spring-dotenv:4.0.0")
+    // Version들은 gradle/libs.versions.toml 파일에서 관리합니다.
+    implementation(libs.bundles.spring.boot)
+    implementation(libs.dotenv)
+    implementation(libs.jetbrains.annotations)
+    implementation(libs.springdoc)
 
-    // Web
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0")
+    implementation(libs.bcpkix)
+
+    //defect detection tool for Java that uses static analysis to look for more than 200 bug patterns
+    implementation(libs.spotbugs)
+
+    // JWT
+    implementation(libs.jjwt.api)
+    runtimeOnly(libs.jjwt.impl)
+    runtimeOnly(libs.jjwt.jackson)
 
     // Database
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.postgresql:postgresql:42.7.3")
+    implementation(libs.postgresql)
+    runtimeOnly(libs.postgresql)
+    implementation(libs.hibernate.spatial)
+
+    implementation(libs.flyway.core)
+    runtimeOnly(libs.flyway.database.postgresql)
+
+    // jOOQ
+    implementation(libs.bundles.jooq)
+    jooqCodegen(libs.postgresql)
 
     // Lombok
-    implementation("org.projectlombok:lombok:1.18.34")
-    annotationProcessor("org.projectlombok:lombok:1.18.34")
-    testCompileOnly("org.projectlombok:lombok:1.18.34")
-    testAnnotationProcessor("org.projectlombok:lombok:1.18.34")
+    implementation(libs.lombok)
+    annotationProcessor(libs.lombok)
+    testCompileOnly(libs.lombok)
+    testAnnotationProcessor(libs.lombok)
 
-    // testcontainers
-    testImplementation("org.testcontainers:testcontainers:1.20.0")
-    testImplementation("org.testcontainers:junit-jupiter:1.20.0")
-    testImplementation("org.testcontainers:jdbc:1.20.0")
-    testImplementation("org.testcontainers:postgresql:1.20.0")
-
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework.security:spring-security-test")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation(libs.bundles.spring.boot.test)
+    testImplementation(libs.bundles.testcontainers)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 tasks.withType<Test> {
@@ -103,10 +121,96 @@ tasks.register<Copy>("updateGitHooks") {
 
 tasks.compileJava {
     dependsOn("updateGitHooks")
+    dependsOn(tasks.jooqCodegen)
 }
 
 tasks.register("projectTest") {
-    dependsOn("spotlessJavaCheck")
-    dependsOn("compileJava")
-    dependsOn("test")
+    dependsOn(tasks.spotlessCheck)
+    dependsOn(tasks.compileJava)
+    dependsOn(tasks.test)
+}
+
+// Here we register service for providing our database during the build.
+val dbContainerProvider = project.gradle.sharedServices.registerIfAbsent("postgres", PostgresService::class) {}
+
+tasks.flywayMigrate {
+    usesService(dbContainerProvider)
+    locations = arrayOf("filesystem:src/main/resources/db/migration")
+    inputs.files(fileTree("src/main/resources/db/migration"))
+
+    doFirst {
+        val dbContainer = dbContainerProvider.get().container()
+        url = dbContainer.jdbcUrl
+        user = dbContainer.username
+        password = dbContainer.password
+    }
+}
+
+afterEvaluate {
+    // For jOOQ to run we always need for flyway to be completed before.
+    tasks.jooqCodegen {
+        dependsOn(tasks.flywayMigrate)
+        doFirst {
+            val dbContainer = dbContainerProvider.get().container()
+            jooq.configuration {
+                jdbc = org.jooq.meta.jaxb.Jdbc().apply {
+                    driver = "org.postgresql.Driver"
+                    url = dbContainer.jdbcUrl
+                    user = dbContainer.username
+                    password = dbContainer.password
+                }
+            }
+        }
+        doLast {
+            dbContainerProvider.orNull?.close()
+        }
+    }
+}
+
+jooq {
+    configuration {
+        logging = org.jooq.meta.jaxb.Logging.WARN
+        generator {
+            name = "org.jooq.codegen.DefaultGenerator"
+            database {
+                name = "org.jooq.meta.postgres.PostgresDatabase"
+                includes = ".*"
+                excludes = "flyway_schema_history"
+                inputSchema = "public"
+                forcedTypes {
+                    forcedType {
+                        userType = "com.dnd.runus.global.constant.MemberRole"
+                        includeExpression = ".*\\.role"
+                    }
+                    forcedType {
+                        userType = "com.dnd.runus.global.constant.SocialType"
+                        includeExpression = ".*\\.social_type"
+                    }
+                    forcedType {
+                        userType = "com.dnd.runus.global.constant.RunningEmoji"
+                        includeExpression = ".*\\.emoji"
+                    }
+                }
+            }
+            target {
+                packageName = "${group}.runus.jooq"
+                directory = "target/generated-sources/jooq"
+            }
+        }
+    }
+}
+
+// Build service for providing database container.
+abstract class PostgresService : BuildService<BuildServiceParameters.None>, AutoCloseable {
+    private val container = org.testcontainers.containers.PostgreSQLContainer<Nothing>(
+        org.testcontainers.utility.DockerImageName.parse(
+            "imresamu/postgis:16-3.4-alpine"
+        ).asCompatibleSubstituteFor("postgres")
+    ).apply {
+        start()
+    }
+
+    override fun close() = container.stop()
+
+    fun container() = container
 }

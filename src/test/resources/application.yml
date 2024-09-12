@@ -1,15 +1,37 @@
 spring:
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate
     show-sql: true
     open-in-view: false
-    defer-datasource-initialization: true
+    defer-datasource-initialization: false
 
   datasource:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
-    url: jdbc:tc:postgresql:16.3://test
+
+  flyway:
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    enabled: true
+    baseline-on-migrate: true # Baseline 생성이 필요한 상황에서 migration 작업 실행시, Baseline 생성부터 하겠다는 설정
 
 app:
   api:
     allow-origins: "*"
+  auth:
+    token:
+      access:
+        expiration: PT1H
+        secret-key: test-long-long-long-secret-key
+  default-zone-offset: +09:00
+
+oauth:
+  apple:
+    base-auth-url: https://appleid.apple.com/auth
+    client_id: client_id
+    key_id: key-id
+    team_id: team-id
+
+weather:
+  openweathermap:
+    url: https://api.openweathermap.org
+    api-key: test-openweathermap-api-key
