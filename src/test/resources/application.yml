@@ -5,6 +5,9 @@ spring:
     show-sql: true
     open-in-view: false
     defer-datasource-initialization: false
+    properties:
+      hibernate:
+        format_sql: true
 
   datasource:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver

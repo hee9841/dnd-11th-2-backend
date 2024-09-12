@@ -244,7 +244,7 @@ class RunningRecordRepositoryImplTest {
         OffsetDateTime today = OffsetDateTime.now(ZoneId.of(SERVER_TIMEZONE));
 
         for (int i = 0; i < 2; i++) {
-            runningRecordRepository.save(new RunningRecord(
+            RunningRecord saved = runningRecordRepository.save(new RunningRecord(
                     0,
                     savedMember,
                     5000,
@@ -257,6 +257,8 @@ class RunningRecordRepositoryImplTest {
                     "start location",
                     "end location",
                     RunningEmoji.SOSO));
+
+            log.warn("!!!!!startDate : " + saved.startAt());
         }
 
         // when
