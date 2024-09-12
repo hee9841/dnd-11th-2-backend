@@ -62,7 +62,7 @@ public class JooqRunningRecordRepository {
                         sum(RUNNING_RECORD.DISTANCE_METER).cast(Integer.class).as("sum_distance"))
                 .from(dateRange)
                 .leftJoin(RUNNING_RECORD)
-                .on(cast(RUNNING_RECORD.START_AT, SQLDataType.DATE).eq(dateRange.field("start_date", SQLDataType.DATE)))
+                .on(cast(RUNNING_RECORD.START_AT, SQLDataType.DATE).eq(dateRange.field("date", SQLDataType.DATE)))
                 .and(RUNNING_RECORD.MEMBER_ID.eq(memberId))
                 .groupBy(dateRange.field("date"))
                 .orderBy(dateRange.field("date"))
