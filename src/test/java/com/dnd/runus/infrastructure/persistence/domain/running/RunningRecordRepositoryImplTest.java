@@ -22,7 +22,10 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.dnd.runus.global.constant.TimeConstant.SERVER_TIMEZONE;
 import static com.dnd.runus.global.constant.TimeConstant.SERVER_TIMEZONE_ID;
@@ -30,6 +33,7 @@ import static java.time.temporal.ChronoField.DAY_OF_WEEK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
@@ -228,7 +232,7 @@ class RunningRecordRepositoryImplTest {
     void getWeeklyDistanceSummary_WithRunningRecords() {
         ZoneOffset defaultZoneOffset = ZoneOffset.of("+09:00");
         // given
-        OffsetDateTime today = OffsetDateTime.now(defaultZoneOffset);
+        OffsetDateTime today = OffsetDateTime.now().toLocalDate().atStartOfDay().atOffset(defaultZoneOffset);
 
         int day = today.get(DAY_OF_WEEK) - 1;
         OffsetDateTime startDate = today.minusDays(day);
@@ -260,19 +264,30 @@ class RunningRecordRepositoryImplTest {
         List<RunningRecordWeeklySummary> result =
                 runningRecordRepository.findWeeklyDistanceSummaryMeter(savedMember.memberId(), startDate);
 
-        // then
-        log.warn("size!!!!!" + result.size());
-        log.warn("todya!!!!!" + today.toString());
-        assertThat(result.size()).isEqualTo(7);
-        result.forEach(v -> {
-            log.warn("!!!!!!!" + v.toString());
-            //            if (v.date().equals(today.toLocalDate())) {
-            //                assertThat(v.sumDistanceMeter()).isEqualTo(10_000);
-            //            } else {
-            //                assertNull(v.sumDistanceMeter());
-            //            }
-        });
+        Map<Integer, Integer> ma = new HashMap<>();
 
-        assertTrue(false);
+        List<Integer> rrr = new ArrayList<>();
+        for (int i = 1; i < 8; i++) {
+            ma.put(i, null);
+        }
+        for (RunningRecordWeeklySummary r : result) {
+            int value = r.date().getDayOfWeek().getValue();
+            Integer ids = r.sumDistanceMeter();
+            ma.put(value, ids);
+        }
+
+        int todayValue = today.getDayOfWeek().getValue();
+
+        // then
+        log.warn("size!!!!!" + ma.size());
+        log.warn("todya!!!!!" + today.toString());
+        assertThat(ma.size()).isEqualTo(7);
+        for (int i = 1; i < 8; i++) {
+            if (i == todayValue) {
+                assertThat(ma.get(i)).isEqualTo(10_000);
+            } else {
+                assertNull(ma.get(i));
+            }
+        }
     }
 }
