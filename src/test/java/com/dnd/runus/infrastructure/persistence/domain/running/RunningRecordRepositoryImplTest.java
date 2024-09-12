@@ -265,14 +265,17 @@ class RunningRecordRepositoryImplTest {
 
         // then
         log.warn("size!!!!!" + result.size());
+        log.warn("todya!!!!!" + today.toString());
         assertThat(result.size()).isEqualTo(7);
         result.forEach(v -> {
             log.warn("!!!!!!!" + v.toString());
-            if (v.date().equals(today.toLocalDate())) {
-                assertThat(v.sumDistanceMeter()).isEqualTo(10_000);
-            } else {
-                assertNull(v.sumDistanceMeter());
-            }
+            //            if (v.date().equals(today.toLocalDate())) {
+            //                assertThat(v.sumDistanceMeter()).isEqualTo(10_000);
+            //            } else {
+            //                assertNull(v.sumDistanceMeter());
+            //            }
         });
+
+        assertTrue(false);
     }
 }
