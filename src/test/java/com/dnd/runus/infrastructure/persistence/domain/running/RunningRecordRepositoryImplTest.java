@@ -10,6 +10,7 @@ import com.dnd.runus.domain.running.RunningRecordWeeklySummary;
 import com.dnd.runus.global.constant.MemberRole;
 import com.dnd.runus.global.constant.RunningEmoji;
 import com.dnd.runus.infrastructure.persistence.annotation.RepositoryTest;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Slf4j
 @RepositoryTest
 class RunningRecordRepositoryImplTest {
 
@@ -264,6 +266,8 @@ class RunningRecordRepositoryImplTest {
         // then
         assertThat(result.size()).isEqualTo(7);
         result.forEach(v -> {
+            log.warn("v.date : " + v.date().toString() + ", tody:"
+                    + today.toLocalDate().toString());
             if (v.date().equals(today.toLocalDate())) {
                 assertThat(v.sumDistanceMeter()).isEqualTo(10_000);
             } else {
