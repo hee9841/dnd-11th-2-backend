@@ -286,5 +286,7 @@ class RunningRecordRepositoryImplTest {
                 assertNull(r.sumDistanceMeter());
             }
         }
+
+        assertTrue(false);
     }
 }
