@@ -14,4 +14,9 @@ public record RunningRecordWeeklySummary(@NotNull LocalDate date, Integer sumDis
     public RunningRecordWeeklySummary(LocalDate date, Duration sumDuration) {
         this(date, null, sumDuration);
     }
+
+    @Override
+    public String toString() {
+        return "WeeklySummary [date=" + date + ", sumDistance=" + sumDistanceMeter + "]";
+    }
 }
