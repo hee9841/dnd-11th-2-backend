@@ -2,6 +2,7 @@ package com.dnd.runus.infrastructure.persistence.jooq.running;
 
 import com.dnd.runus.domain.running.RunningRecordWeeklySummary;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jooq.CommonTableExpression;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -23,6 +24,7 @@ import static org.jooq.impl.DSL.name;
 import static org.jooq.impl.DSL.select;
 import static org.jooq.impl.DSL.sum;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class JooqRunningRecordRepository {
@@ -47,7 +49,7 @@ public class JooqRunningRecordRepository {
         LocalDate startDate = today.minusDays(day).toLocalDate();
 
         CommonTableExpression<Record1<Date>> dateRange = name("date_range")
-                .fields("start_date")
+                .fields("date")
                 .as(select(field(
                         "generate_series(?, ?, interval '1 day')",
                         SQLDataType.DATE,
@@ -56,22 +58,24 @@ public class JooqRunningRecordRepository {
 
         return dsl.with(dateRange)
                 .select(
-                        dateRange.field("start_date", SQLDataType.DATE),
+                        dateRange.field("date", SQLDataType.DATE),
                         sum(RUNNING_RECORD.DISTANCE_METER).cast(Integer.class).as("sum_distance"))
                 .from(dateRange)
                 .leftJoin(RUNNING_RECORD)
                 .on(cast(RUNNING_RECORD.START_AT, SQLDataType.DATE).eq(dateRange.field("start_date", SQLDataType.DATE)))
                 .and(RUNNING_RECORD.MEMBER_ID.eq(memberId))
-                .groupBy(dateRange.field("start_date"))
-                .orderBy(dateRange.field("start_date"))
+                .groupBy(dateRange.field("date"))
+                .orderBy(dateRange.field("date"))
                 .fetch(new RunningWeeklyDistanceSummary());
     }
 
     private static class RunningWeeklyDistanceSummary implements RecordMapper<Record, RunningRecordWeeklySummary> {
         @Override
         public RunningRecordWeeklySummary map(Record record) {
+            log.warn("RunningRecordWeeklySummary Map!!!!!!");
+            log.warn(record.get("date", LocalDate.class).toString() + ": " + record.get("sum_distance", Integer.class));
             return new RunningRecordWeeklySummary(
-                    record.get("start_date", LocalDate.class), record.get("sum_distance", Integer.class));
+                    record.get("date", LocalDate.class), record.get("sum_distance", Integer.class));
         }
     }
 }

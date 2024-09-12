@@ -261,6 +261,13 @@ class RunningRecordRepositoryImplTest {
             log.warn("!!!!!startDate : " + saved.startAt());
         }
 
+        List<RunningRecord> byMember = runningRecordRepository.findByMember(savedMember);
+
+        log.warn("!!!!RunningRecord");
+        for (RunningRecord record : byMember) {
+            log.warn("record.startAt:" + record.startAt().toString());
+        }
+
         // when
         List<RunningRecordWeeklySummary> result =
                 runningRecordRepository.findWeeklyDistanceSummaryMeter(savedMember.memberId(), today);
