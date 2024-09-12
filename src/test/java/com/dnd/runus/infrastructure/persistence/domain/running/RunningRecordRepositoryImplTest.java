@@ -261,6 +261,8 @@ class RunningRecordRepositoryImplTest {
         List<RunningRecordWeeklySummary> result =
                 runningRecordRepository.findWeeklyDistanceSummaryMeter(savedMember.memberId(), today);
 
+        System.out.println("!!!!!!!!!!Test:" + today.toLocalDate());
+
         // then
         assertThat(result.size()).isEqualTo(7);
         result.forEach(v -> {
