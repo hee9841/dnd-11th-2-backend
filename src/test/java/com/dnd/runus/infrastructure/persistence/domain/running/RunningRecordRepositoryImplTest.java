@@ -26,6 +26,7 @@ import java.util.List;
 
 import static com.dnd.runus.global.constant.TimeConstant.SERVER_TIMEZONE;
 import static com.dnd.runus.global.constant.TimeConstant.SERVER_TIMEZONE_ID;
+import static java.time.temporal.ChronoField.DAY_OF_WEEK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -229,6 +230,9 @@ class RunningRecordRepositoryImplTest {
         // given
         OffsetDateTime today = OffsetDateTime.now(defaultZoneOffset);
 
+        int day = today.get(DAY_OF_WEEK) - 1;
+        OffsetDateTime startDate = today.minusDays(day);
+
         for (int i = 0; i < 2; i++) {
             runningRecordRepository.save(new RunningRecord(
                     0,
@@ -254,7 +258,7 @@ class RunningRecordRepositoryImplTest {
 
         // when
         List<RunningRecordWeeklySummary> result =
-                runningRecordRepository.findWeeklyDistanceSummaryMeter(savedMember.memberId(), today);
+                runningRecordRepository.findWeeklyDistanceSummaryMeter(savedMember.memberId(), startDate);
 
         // then
         log.warn("size!!!!!" + result.size());

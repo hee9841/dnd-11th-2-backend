@@ -17,7 +17,6 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import static com.dnd.runus.jooq.Tables.RUNNING_RECORD;
-import static java.time.temporal.ChronoField.DAY_OF_WEEK;
 import static org.jooq.impl.DSL.cast;
 import static org.jooq.impl.DSL.field;
 import static org.jooq.impl.DSL.name;
@@ -43,18 +42,24 @@ public class JooqRunningRecordRepository {
         return 0;
     }
 
-    public List<RunningRecordWeeklySummary> findWeeklyDistanceSummaryMeter(long memberId, OffsetDateTime today) {
+    public List<RunningRecordWeeklySummary> findWeeklyDistanceSummaryMeter(
+            long memberId, OffsetDateTime startWeekDate) {
 
-        int day = today.get(DAY_OF_WEEK) - 1;
-        LocalDate startDate = today.minusDays(day).toLocalDate();
+        //        int day = today.get(DAY_OF_WEEK) - 1;
+        //        LocalDate startDate = today.minusDays(day).toLocalDate();
+        //
+        //        OffsetDateTime now = OffsetDateTime.now();atOffset
+
+        // 오늘 자정으로 설정합니다.
+        //        OffsetDateTime todayMidnight = now.toLocalDate().atStartOfDay(now.getOffset().getId());
 
         CommonTableExpression<Record1<Date>> dateRange = name("date_range")
                 .fields("date")
                 .as(select(field(
                         "generate_series(?, ?, interval '1 day')",
                         SQLDataType.DATE,
-                        startDate,
-                        startDate.plusDays(6))));
+                        startWeekDate,
+                        startWeekDate.plusDays(6))));
 
         return dsl.with(dateRange)
                 .select(
