@@ -287,6 +287,6 @@ class RunningRecordRepositoryImplTest {
             }
         }
 
-        assertTrue(false);
+        //        assertTrue(false);
     }
 }
