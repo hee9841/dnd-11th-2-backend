@@ -264,11 +264,10 @@ class RunningRecordRepositoryImplTest {
                 runningRecordRepository.findWeeklyDistanceSummaryMeter(savedMember.memberId(), today);
 
         // then
+        log.warn("size!!!!!" + result.size());
         assertThat(result.size()).isEqualTo(7);
         result.forEach(v -> {
             log.warn("!!!!!!!" + v.toString());
-            log.warn("v.date : " + v.date().toString() + ", tody:"
-                    + today.toLocalDate().toString());
             if (v.date().equals(today.toLocalDate())) {
                 assertThat(v.sumDistanceMeter()).isEqualTo(10_000);
             } else {
