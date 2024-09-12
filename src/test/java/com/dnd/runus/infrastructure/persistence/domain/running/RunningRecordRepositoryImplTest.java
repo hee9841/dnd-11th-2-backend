@@ -6,9 +6,11 @@ import com.dnd.runus.domain.member.Member;
 import com.dnd.runus.domain.member.MemberRepository;
 import com.dnd.runus.domain.running.RunningRecord;
 import com.dnd.runus.domain.running.RunningRecordRepository;
+import com.dnd.runus.domain.running.RunningRecordWeeklySummary;
 import com.dnd.runus.global.constant.MemberRole;
 import com.dnd.runus.global.constant.RunningEmoji;
 import com.dnd.runus.infrastructure.persistence.annotation.RepositoryTest;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,16 +20,20 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static com.dnd.runus.global.constant.TimeConstant.SERVER_TIMEZONE;
 import static com.dnd.runus.global.constant.TimeConstant.SERVER_TIMEZONE_ID;
+import static java.time.temporal.ChronoField.DAY_OF_WEEK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Slf4j
 @RepositoryTest
 class RunningRecordRepositoryImplTest {
 
@@ -216,5 +222,71 @@ class RunningRecordRepositoryImplTest {
         // then
         assertNotNull(results);
         assertThat(results.size()).isEqualTo(2);
+    }
+
+    @DisplayName("러닝 주간 서머리 조회(거리) : 러닝 데이터 있을 경우, 해당 요일에 러닝 데이터는 sum한 값이 리턴된다.")
+    @Test
+    void getWeeklyDistanceSummary_WithRunningRecords() {
+        ZoneOffset defaultZoneOffset = ZoneOffset.of("+09:00");
+        // given
+        OffsetDateTime today = OffsetDateTime.now().toLocalDate().atStartOfDay().atOffset(defaultZoneOffset);
+
+        int day = today.get(DAY_OF_WEEK) - 1;
+        OffsetDateTime startDate = today.minusDays(day);
+
+        for (int i = 0; i < 2; i++) {
+            runningRecordRepository.save(new RunningRecord(
+                    0,
+                    savedMember,
+                    5000,
+                    Duration.ofHours(1),
+                    1,
+                    new Pace(5, 11),
+                    OffsetDateTime.now(defaultZoneOffset),
+                    OffsetDateTime.now(defaultZoneOffset),
+                    List.of(new Coordinate(1, 2, 3), new Coordinate(4, 5, 6)),
+                    "start location",
+                    "end location",
+                    RunningEmoji.SOSO));
+        }
+
+        List<RunningRecord> byMember = runningRecordRepository.findByMember(savedMember);
+
+        log.warn("!!!!RunningRecord");
+        for (RunningRecord record : byMember) {
+            log.warn("record.startAt:" + record.startAt().toString());
+        }
+
+        // when
+        List<RunningRecordWeeklySummary> result =
+                runningRecordRepository.findWeeklyDistanceSummaryMeter(savedMember.memberId(), startDate);
+
+        //        Map<Integer, Integer> ma = new HashMap<>();
+        //
+        //        List<Integer> rrr = new ArrayList<>();
+        //        for (int i = 1; i < 8; i++) {
+        //            ma.put(i, null);
+        //        }
+        //        for (RunningRecordWeeklySummary r : result) {
+        //            int value = r.date().getDayOfWeek().getValue();
+        //            Integer ids = r.sumDistanceMeter();
+        //            ma.put(value, ids);
+        //        }
+        //
+        int todayValue = today.getDayOfWeek().getValue();
+        LocalDate todayLocalDate = today.toLocalDate();
+
+        // then
+        assertThat(result.size()).isEqualTo(7);
+
+        for (RunningRecordWeeklySummary r : result) {
+            if (r.date().toString().equals(todayLocalDate.toString())) {
+                assertThat(r.sumDistanceMeter()).isEqualTo(10000);
+            } else {
+                assertNull(r.sumDistanceMeter());
+            }
+        }
+
+        //        assertTrue(false);
     }
 }
